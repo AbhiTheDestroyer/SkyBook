@@ -1,0 +1,1 @@
+import type{SmartWaitlistService}from'../../services/waitlist.js';export class WaitlistEligibilityService{constructor(private service:SmartWaitlistService){}check(user:any,flight:any,input:any){return this.service.eligibility(user,flight,input)}}

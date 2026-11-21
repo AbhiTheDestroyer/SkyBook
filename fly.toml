@@ -1,0 +1,49 @@
+# Fly.io config. Deploy with:
+#
+#   fly launch --no-deploy            # or: fly apps create skybook-<yourname>
+#   fly volumes create skybook_data --size 1 --region bom
+#   fly secrets set SKYBOOK_ADMIN_PASSWORD='<long-random-value>'
+#   fly deploy
+#
+# The volume is what makes this permanent. Without it the SQLite database is
+# wiped on every deploy. `bom` (Mumbai) is a reasonable region for India.
+#
+# Fly terminates TLS automatically, so the Secure production cookies work —
+# HTTPS is required, not optional.
+
+app = "skybook"
+primary_region = "bom"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3001"
+  ENABLE_DEV_SESSIONS = "false"
+  SKYBOOK_DB_PATH = "/data/skybook.db"
+  SKYBOOK_DEMO_USERS = "false"
+  TRUST_PROXY = "1"
+
+[[mounts]]
+  source = "skybook_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "25s"
+  method = "GET"
+  path = "/api/health"

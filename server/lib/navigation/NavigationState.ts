@@ -1,0 +1,2 @@
+export type NavigationStatus='IDLE'|'SEARCHING'|'ROUTE_READY'|'NAVIGATING'|'ARRIVED'|'ERROR';
+export interface NavigationState{currentAirport:string;currentTerminal?:string;currentFloor?:number;currentLocation?:number;destination?:number;routeType:'FASTEST'|'SHORTEST'|'ACCESSIBLE'|'LOW_WALKING'|'FAMILY';distanceRemaining:number;timeRemaining:number;currentInstruction:number;status:NavigationStatus}

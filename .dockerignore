@@ -1,0 +1,26 @@
+node_modules
+dist
+.git
+.gitignore
+.cache
+.local
+.venv
+__pycache__
+build
+coverage
+out
+target
+*.log
+
+# Local database and WAL/SHM sidecars must never be baked into an image.
+data
+uploads
+.env
+.env.*
+!.env.example
+
+# Local QA artifacts
+*.png
+*-QA_AUDIT.md
+admin-login-result.png
+tsconfig*.tsbuildinfo

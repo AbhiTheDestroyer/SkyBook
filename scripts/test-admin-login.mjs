@@ -1,0 +1,15 @@
+import { chromium } from 'playwright';
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:1280,height:900}});
+const consoleErrors=[];const failed=[];const responses=[];
+page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text())});
+page.on('requestfailed',r=>failed.push(`${r.method()} ${r.url()} ${r.failure()?.errorText}`));
+page.on('response',r=>{if(r.url().includes('/api/'))responses.push(`${r.status()} ${new URL(r.url()).pathname}`)});
+await page.goto('http://127.0.0.1:5173/admin/login',{waitUntil:'networkidle'});
+await page.getByLabel('Email').fill('admin@skybook.com');
+await page.getByLabel('Password').fill('SkyBook@Admin123');
+await page.getByRole('button',{name:/Login as administrator/i}).click();
+await page.waitForTimeout(1500);
+console.log(JSON.stringify({url:page.url(),title:await page.title(),heading:await page.locator('h1').first().textContent(),responses,consoleErrors,failed,localToken:!!(await page.evaluate(()=>localStorage.getItem('skybook_session'))),cookies:(await page.context().cookies()).map(x=>({name:x.name,httpOnly:x.httpOnly,sameSite:x.sameSite,path:x.path}))},null,2));
+await page.screenshot({path:'admin-login-result.png',fullPage:true});
+await browser.close();

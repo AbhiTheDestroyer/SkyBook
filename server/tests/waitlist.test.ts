@@ -1,0 +1,4 @@
+import test from'node:test';import assert from'node:assert/strict';import{WaitlistProbabilityService}from'../services/waitlist.js';
+test('waitlist probability is bounded and explainable',()=>{const x=WaitlistProbabilityService.calculate({position:2,queueSize:6,availableSeats:0,daysRemaining:2});assert.ok(x.probability>=5&&x.probability<=92);assert.equal(x.model,'SKYBOOK_DEMO_V1');assert.ok(x.factors.length>=4)});
+test('earlier FIFO position has no lower probability',()=>{const a=WaitlistProbabilityService.calculate({position:1,queueSize:5,availableSeats:0,daysRemaining:2}),b=WaitlistProbabilityService.calculate({position:4,queueSize:5,availableSeats:0,daysRemaining:2});assert.ok(a.probability>=b.probability)});
+test('probability never promises certainty',()=>{const x=WaitlistProbabilityService.calculate({position:1,queueSize:1,availableSeats:5,daysRemaining:10});assert.ok(x.probability<100)});

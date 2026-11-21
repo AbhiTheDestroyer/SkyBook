@@ -1,0 +1,33 @@
+# Caddy reverse proxy: terminates TLS and forwards to the app.
+# Caddy fetches and renews the Let's Encrypt certificate automatically, which is
+# required because production session cookies are marked Secure.
+#
+# Replace {$DOMAIN} via the DOMAIN environment variable in docker-compose.yml.
+
+{$DOMAIN} {
+	encode gzip zstd
+
+	# Host must be forwarded intact: the CSRF middleware compares the Origin
+	# header against Host, and rejects requests where they disagree.
+	reverse_proxy app:3001 {
+		header_up Host {host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-For {remote_host}
+	}
+
+	# Static assets and the bundled JS/CSS are content-hashed by Vite, so they
+	# are safe to cache aggressively.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

@@ -1,0 +1,68 @@
+# SkyBook — permanent deployment with automatic HTTPS.
+#
+#   DOMAIN=skybook.example.com docker compose up -d
+#
+# This is the genuinely permanent option: data lives in a named Docker volume
+# that survives restarts, redeploys and reboots, and Caddy obtains and renews a
+# Let's Encrypt certificate for you automatically.
+#
+# Requirements: a VPS with Docker, a domain whose A record points at it,
+# and ports 80 + 443 open. HTTPS is mandatory, not optional — session cookies
+# are Secure-only in production and will be silently dropped over plain HTTP.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # Dev sessions expose /api/auth/demo-session. Must stay false in production.
+      ENABLE_DEV_SESSIONS: "false"
+      # Persistent SQLite location, backed by the volume below.
+      SKYBOOK_DB_PATH: /data/skybook.db
+      # Restrict cross-origin calls to your real domain.
+      CORS_ORIGIN: https://${DOMAIN}
+      # Trust exactly one hop (Caddy) so login rate limiting sees real client IPs.
+      TRUST_PROXY: "1"
+      # REQUIRED: password for the bootstrap admin (admin@skybook.demo).
+      # If unset, a random password is generated and you cannot log in.
+      SKYBOOK_ADMIN_PASSWORD: ${SKYBOOK_ADMIN_PASSWORD:?set SKYBOOK_ADMIN_PASSWORD before deploying}
+      # Set to "false" to strip the published demo-account passwords.
+      # Recommended for any host reachable by the public.
+      SKYBOOK_DEMO_USERS: ${SKYBOOK_DEMO_USERS:-false}
+      # Optional: real flight inventory. Without these, flights are demo data.
+      AMADEUS_API_KEY: ${AMADEUS_API_KEY:-}
+      AMADEUS_API_SECRET: ${AMADEUS_API_SECRET:-}
+    volumes:
+      - skybook-data:/data
+    expose:
+      - "3001"
+    # Not published to the host: only Caddy reaches it, over the private network.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 25s
+      retries: 3
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN before deploying}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  # DO NOT remove this volume: it holds every user, booking and waitlist entry.
+  skybook-data:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,2 @@
+import type Database from 'better-sqlite3';
+export class AirportService{constructor(private db:Database.Database){}getAirport(code:string){return this.db.prepare('SELECT id,iata code,name,city,country FROM airports WHERE iata=?').get(code)}getTerminals(airportId:number){return this.db.prepare('SELECT * FROM navigation_terminals WHERE airport_id=? AND active=1').all(airportId)}getFloors(terminalId:number){return this.db.prepare('SELECT * FROM navigation_floors WHERE terminal_id=? AND active=1').all(terminalId)}}

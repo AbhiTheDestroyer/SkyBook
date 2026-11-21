@@ -1,0 +1,43 @@
+{
+  "name": "skybook",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ENABLE_DEV_SESSIONS=true concurrently \"tsx watch server/index.ts\" \"vite --host 0.0.0.0\"",
+    "build": "tsc -b && vite build",
+    "start": "tsx server/index.ts",
+    "test": "tsx --test server/tests/*.test.ts",
+    "seed:development": "tsx scripts/seed-development.ts"
+  },
+  "dependencies": {
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "better-sqlite3": "^11.8.1",
+    "cors": "latest",
+    "dotenv": "^17.4.2",
+    "express": "latest",
+    "framer-motion": "latest",
+    "lucide-react": "latest",
+    "qrcode": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-router-dom": "latest",
+    "three": "latest",
+    "tsx": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "latest",
+    "@types/express": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/three": "latest",
+    "@vitejs/plugin-react": "latest",
+    "concurrently": "latest",
+    "playwright": "^1.62.1",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}

@@ -1,0 +1,1 @@
+import type{SmartWaitlistService}from'../../services/waitlist.js';export class WaitlistMatchingEngine{constructor(private service:SmartWaitlistService){}process(flightId:number,idempotencyKey:string){return this.service.processAllAvailableSeats(flightId,idempotencyKey)}}

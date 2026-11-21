@@ -1,0 +1,1 @@
+export const DEFAULT_WAITLIST_POLICY='FIFO';export const explainPriority=()=>['Active status','Authorization valid','Required seats available','Fare within maximum authorization','Joined-at timestamp','Stable entry ID'];

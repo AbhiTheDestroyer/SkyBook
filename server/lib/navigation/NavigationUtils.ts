@@ -1,0 +1,1 @@
+export const DEFAULT_WALKING_SPEED=1.35;export const estimateSeconds=(distance:number,speed=DEFAULT_WALKING_SPEED)=>Math.ceil(distance/speed);export const normalizeGate=(terminal:string,gate:string)=>/^[AB]/i.test(gate)?gate.toUpperCase():`${terminal.toUpperCase().includes('1')?'A':'B'}${gate}`;

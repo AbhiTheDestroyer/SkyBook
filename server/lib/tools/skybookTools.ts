@@ -1,0 +1,2 @@
+import{AI_TOOLS,type AIToolName}from'../ai/tools.js';import{canUse}from'../ai/permissions.js';
+export class ToolRegistry{constructor(private handlers:Partial<Record<AIToolName,(args:any)=>Promise<any>|any>>){}async execute(name:AIToolName,args:any,ctx:{role:string;confirmed?:boolean}){const permission=AI_TOOLS[name];if(!permission)throw Error('Tool is not registered');if(!canUse(permission,ctx.role,ctx.confirmed))throw Error(`Permission denied: ${permission}`);const handler=this.handlers[name];if(!handler)throw Error('Tool is not available');return handler(args)}}

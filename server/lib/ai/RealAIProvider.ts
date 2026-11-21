@@ -1,0 +1,2 @@
+import type {AIProvider} from './AIProvider.js';import type {AssistantContext,AssistantReply} from '../../services/assistant.js';import{groundedLLMReply}from'../../services/assistant.js';
+export class RealAIProvider implements AIProvider{name='RealAIProvider';available=!!(process.env.AI_API_KEY||process.env.OPENAI_API_KEY);async generate(message:string,context:AssistantContext,draft:AssistantReply){return groundedLLMReply(message,context,draft)}}

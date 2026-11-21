@@ -1,0 +1,1 @@
+import type{SmartWaitlistService}from'../../services/waitlist.js';export class WaitlistPromotionService{constructor(private service:SmartWaitlistService){}confirm(user:any,id:number,promoCode?:string){return this.service.confirm(user,id,false,promoCode)}decline(user:any,id:number){return this.service.decline(user,id)}expire(id:number){return this.service.expirePromotion(id)}}

@@ -1,0 +1,50 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# IMPORTANT: the `disk:` block below requires a PAID instance type. Render's free
+# tier has an ephemeral filesystem, so the SQLite database — every user, booking
+# and waitlist entry — is erased on each deploy and restart. If you deploy on the
+# free tier, treat it as a disposable demo, not a permanent service.
+#
+# Deploy: push this repo to GitHub, then Render -> New -> Blueprint.
+
+services:
+  - type: web
+    name: skybook
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter # required for a persistent disk
+    healthCheckPath: /api/health
+    autoDeploy: true
+    disk:
+      name: skybook-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      # Keep dev-only endpoints (/api/auth/demo-session) switched off.
+      - key: ENABLE_DEV_SESSIONS
+        value: "false"
+      # SQLite on the persistent disk.
+      - key: SKYBOOK_DB_PATH
+        value: /data/skybook.db
+      # One trusted proxy hop (Render's load balancer) for correct client IPs.
+      - key: TRUST_PROXY
+        value: "1"
+      # Strips the published demo passwords. Accounts stay, passwords become random.
+      - key: SKYBOOK_DEMO_USERS
+        value: "false"
+      # Bootstrap admin password. Set in the Render dashboard; never commit it.
+      # Without it a random password is generated and you cannot sign in.
+      - key: SKYBOOK_ADMIN_PASSWORD
+        sync: false
+      # Set this to your Render URL, e.g. https://skybook.onrender.com
+      - key: CORS_ORIGIN
+        sync: false
+      # Optional: real flight inventory instead of generated demo data.
+      - key: AMADEUS_API_KEY
+        sync: false
+      - key: AMADEUS_API_SECRET
+        sync: false
